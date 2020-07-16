@@ -215,7 +215,9 @@ void SigGen_i::start() throw (CF::Resource::StartError, CORBA::SystemException) 
 ************************************************************************************************/
 int SigGen_i::serviceFunction()
 {
-	{
+
+	if (!throttle || bulkio::time::utils::now() > nextTime) {
+	{ //scope for scope lock
 		// Cache/update from props and class vars that we do not want changing during execution
 		boost::mutex::scoped_lock lock(sigGenLock_);
 
@@ -306,15 +308,7 @@ int SigGen_i::serviceFunction()
 		nextTime.twsec += 1.0;
 	}
 
-	// If we are throttling, wait...otherwise run at full speed
-	if (throttle == true) {
-		long wait_amt_usec = (long)(cache.xfer_len * cache.sri.xdelta * 1000000.0);
-		try {
-			usleep(wait_amt_usec);
-		} catch (...) {
-			return NORMAL;
-		}
-	}
+	} //end scope
 
 	return NORMAL;
 }
