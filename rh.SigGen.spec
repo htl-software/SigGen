@@ -1,23 +1,25 @@
 #
-# This file is protected by Copyright. Please refer to the COPYRIGHT file distributed with this
-# source distribution.
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
 #
-# This file is part of REDHAWK Basic Components SigGen.
+# This file is part of REDHAWK SigGen.
 #
-# REDHAWK Basic Components SigGen is free software: you can redistribute it and/or modify it under the terms of
-# the GNU Lesser General Public License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
+# REDHAWK SigGen is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
 #
-# REDHAWK Basic Components SigGen is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-# PURPOSE.  See the GNU Lesser General Public License for more details.
+# REDHAWK SigGen is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+# for more details.
 #
-# You should have received a copy of the GNU Lesser General Public License along with this
-# program.  If not, see http://www.gnu.org/licenses/.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 # By default, the RPM will install to the standard REDHAWK SDR root location (/var/redhawk/sdr)
 # You can override this at install time using --prefix /new/sdr/root when invoking rpm (preferred method, if you must)
-%{!?_sdrroot: %define _sdrroot /var/redhawk/sdr}
+%{!?_sdrroot: %global _sdrroot /var/redhawk/sdr}
 %define _prefix %{_sdrroot}
 Prefix:         %{_prefix}
 
@@ -33,26 +35,21 @@ Release:        1%{?dist}
 Summary:        Component %{name}
 
 Group:          REDHAWK/Components
-License:        LGPLv3+
+License:        None
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  redhawk-devel >= 2.0
-Requires:       redhawk >= 2.0
+BuildRequires:  redhawk-devel >= 2.2
+Requires:       redhawk >= 2.2
 
-Requires:       libuuid
-BuildRequires:  libuuid-devel
 
 # Interface requirements
-BuildRequires:  bulkioInterfaces >= 2.0
-Requires:       bulkioInterfaces >= 2.0
+BuildRequires:  bulkioInterfaces >= 2.2
+Requires:       bulkioInterfaces >= 2.2
 
 # Implementation java
-BuildRequires:  java-devel >= 1.6
-Requires:       java >= 1.6
-
-# Allow upgrades from previous package name
-Obsoletes:      SigGen < 2.0.0
+Requires: java >= 1.8
+BuildRequires: java-devel >= 1.8
 
 %description
 Component %{name}
@@ -113,15 +110,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,redhawk,redhawk,-)
-%dir %{_prefix}/dom/components/rh/SigGen
+%dir %{_sdrroot}/dom/components/rh
+%dir %{_sdrroot}/dom/components/rh/SigGen
 %{_prefix}/dom/components/rh/SigGen/SigGen.scd.xml
 %{_prefix}/dom/components/rh/SigGen/SigGen.prf.xml
 %{_prefix}/dom/components/rh/SigGen/SigGen.spd.xml
 %{_prefix}/dom/components/rh/SigGen/cpp
 %{_prefix}/dom/components/rh/SigGen/python
 %{_prefix}/dom/components/rh/SigGen/java
-
-%changelog
-* Wed Jun 21 2017 Ryan Bauman <rbauman@lgsinnovations.com> - 2.0.1-2
-- Mass rebuild for REDHAWK 2.1.1
 

@@ -20,7 +20,9 @@
 #define SIGGEN_IMPL_H
 
 #include "SigGen_base.h"
-#include <uuid/uuid.h>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 class SigGen_i;
 
@@ -34,6 +36,7 @@ struct SigGenCache {
 		xfer_len=0;
 		shape="sine";
 		sriUpdate=true;
+        use_complex=1;
 	};
 
 	long xfer_len;
@@ -41,15 +44,10 @@ struct SigGenCache {
 	std::string stream_id;
 	BULKIO::StreamSRI sri;
 	bool sriUpdate;
+    long use_complex;
 };
 
-inline std::string uuidGenerator() {
-    uuid_t new_random_uuid;
-    uuid_generate_random(new_random_uuid);
-    char new_random_uuid_str[37];
-    uuid_unparse(new_random_uuid, new_random_uuid_str);
-    return std::string(new_random_uuid_str);
-};
+inline std::string uuidGenerator();
 
 class SigGen_i : public SigGen_base
 {
@@ -69,6 +67,7 @@ class SigGen_i : public SigGen_base
         void keywordUpdate(const double *oldValue, const double *newValue);
         void sri_blockingChanged(const bool *oldValue, const bool *newValue);
         void samplerateChanged(const double *oldValue, const double *newValue);
+        void complexChanged(const int *oldValue, const int *newValue);
         void convertFloat2short(std::vector<float>& src, std::vector<short>& dst);
 
         std::vector<float> floatData;

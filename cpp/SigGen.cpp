@@ -31,6 +31,14 @@
 
 PREPARE_LOGGING(SigGen_i)
 
+
+boost::uuids::random_generator generator;
+
+inline std::string uuidGenerator() {
+    boost::uuids::uuid new_random_uuid = generator();
+    return boost::uuids::to_string(new_random_uuid);
+}
+
 SigGen_i::SigGen_i(const char *uuid, const char *label) :
     SigGen_base(uuid, label)
 {
@@ -46,7 +54,7 @@ SigGen_i::SigGen_i(const char *uuid, const char *label) :
 	sri.ystart = 0.0;
 	sri.ydelta = 0.0;
 	sri.yunits = BULKIO::UNITS_NONE;
-	sri.mode = 0;
+	sri.mode = use_complex-1; // -1 to convert from 1/2 to 0/1
 	sri.blocking = sri_blocking;
 	sri.streamID = stream_id.c_str();
 	keywordUpdate(NULL, NULL);
@@ -59,7 +67,7 @@ SigGen_i::SigGen_i(const char *uuid, const char *label) :
 	addPropertyChangeListener("col_rf", this, &SigGen_i::keywordUpdate);
 	addPropertyChangeListener("sri_blocking", this, &SigGen_i::sri_blockingChanged);
 	addPropertyChangeListener("sample_rate", this, &SigGen_i::samplerateChanged);
-
+	addPropertyChangeListener("use_complex", this, &SigGen_i::complexChanged);
 }
 
 
@@ -230,6 +238,7 @@ int SigGen_i::serviceFunction()
 			cache.stream_id = stream_id;
 		}
 
+		cache.use_complex = use_complex;
 		cache.xfer_len = xfer_len;
 		cache.shape = shape;
 		delta_phase = frequency * cache.sri.xdelta;
@@ -241,9 +250,10 @@ int SigGen_i::serviceFunction()
 		eos_stream_id.clear();
 	}
 
-	if (((size_t) cache.xfer_len != floatData.size()) || ((size_t) cache.xfer_len != shortData.size())) {
-		floatData.resize(cache.xfer_len);
-		shortData.resize(cache.xfer_len);
+	//multiply by use_complex as complex data requires twice as much buffer space (half for real, half for imaginary)
+	if (((size_t) (cache.xfer_len*cache.use_complex) != floatData.size()) || ((size_t) (cache.xfer_len*cache.use_complex) != shortData.size())) {
+		floatData.resize(cache.xfer_len*cache.use_complex);
+		shortData.resize(cache.xfer_len*cache.use_complex);
 	}
 
 	if (cache.sriUpdate) {
@@ -264,21 +274,21 @@ int SigGen_i::serviceFunction()
 
 	// Generate the Waveform
 	if (cache.shape == "sine"){
-		Waveform::sincos(floatData, magnitude, phase, delta_phase, cache.xfer_len, 1);
+		Waveform::sincos(floatData, magnitude, phase, delta_phase, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "square"){
-		Waveform::square(floatData, magnitude, phase, delta_phase, cache.xfer_len, 1);
+		Waveform::square(floatData, magnitude, phase, delta_phase, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "triangle") {
-		Waveform::triangle(floatData, magnitude, phase, delta_phase, cache.xfer_len, 1);
+		Waveform::triangle(floatData, magnitude, phase, delta_phase, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "sawtooth") {
-		Waveform::sawtooth(floatData, magnitude, phase, delta_phase, cache.xfer_len, 1);
+		Waveform::sawtooth(floatData, magnitude, phase, delta_phase, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "pulse") {
-		Waveform::pulse(floatData, magnitude, phase, delta_phase, cache.xfer_len, 1);
+		Waveform::pulse(floatData, magnitude, phase, delta_phase, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "constant") {
-		Waveform::constant(floatData, magnitude, cache.xfer_len, 1);
+		Waveform::constant(floatData, magnitude, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "whitenoise") {
-		Waveform::whitenoise(floatData, magnitude, cache.xfer_len, 1);
+		Waveform::whitenoise(floatData, magnitude, cache.xfer_len, cache.use_complex);
 	} else if (cache.shape == "lrs") {
-		Waveform::lrs(floatData, magnitude, cache.xfer_len, 1, 1);
+		Waveform::lrs(floatData, magnitude, cache.xfer_len, 1, cache.use_complex);
 	}
 
 	phase += delta_phase * cache.xfer_len; // increment phase
@@ -324,7 +334,7 @@ void SigGen_i::convertFloat2short(std::vector<float>& src, std::vector<short>& d
 void SigGen_i::stream_idChanged(const std::string *oldValue, const std::string *newValue)
 {
 	if (*oldValue == *newValue) {
-		std::cerr << "This can happen!?!";
+		LOG_ERROR(SigGen_i, "Stream registered ID change without ID switching value!");
 		return;
 	}
 
@@ -369,5 +379,14 @@ void SigGen_i::samplerateChanged(const double *oldValue, const double *newValue)
 {
 	boost::mutex::scoped_lock lock(sigGenLock_);
 	sri.xdelta = 1.0/sample_rate;
+	sriUpdate = true;
+}
+
+// Update sri.xdelta
+void SigGen_i::complexChanged(const int *oldValue, const int *newValue)
+{
+	boost::mutex::scoped_lock lock(sigGenLock_);
+	LOG_DEBUG(SigGen_i, "Switching to " << (use_complex-1 ? "complex" : "real") << " mode");
+	sri.mode = use_complex-1;
 	sriUpdate = true;
 }

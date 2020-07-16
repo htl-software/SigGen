@@ -1,23 +1,27 @@
 /*
- * This file is protected by Copyright. Please refer to the COPYRIGHT file distributed with this 
- * source distribution.
- * 
- * This file is part of REDHAWK Basic Components SigGen.
- * 
- * REDHAWK Basic Components SigGen is free software: you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- * 
- * REDHAWK Basic Components SigGen is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program.  If not, see http://www.gnu.org/licenses/.
+ * This file is protected by Copyright. Please refer to the COPYRIGHT file
+ * distributed with this source distribution.
+ *
+ * This file is part of REDHAWK SigGen.
+ *
+ * REDHAWK SigGen is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * REDHAWK SigGen is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 package SigGen.java;
 
+
 import java.util.Properties;
+import org.ossie.component.RHLogger;
 
 import org.apache.log4j.Logger;
 
@@ -32,6 +36,8 @@ import CF.InvalidObjectReference;
 import org.ossie.component.*;
 import org.ossie.properties.*;
 
+
+
 /**
  * This is the component code. This file contains all the access points
  * you need to use to be able to access all input and output ports,
@@ -41,11 +47,40 @@ import org.ossie.properties.*;
  *
  * @generated
  */
-public abstract class SigGen_base extends ThreadedResource {
+
+public abstract class SigGen_base extends Component 
+{
     /**
      * @generated
      */
     public final static Logger logger = Logger.getLogger(SigGen_base.class.getName());
+
+    /**
+     * Enumerated values for properties
+     */
+    public static class enums {
+        /**
+         * Enumerated values for shape
+         */
+        public static class shape {
+            public static final String sine = "sine";
+            public static final String square = "square";
+            public static final String triangle = "triangle";
+            public static final String sawtooth = "sawtooth";
+            public static final String pulse = "pulse";
+            public static final String constant = "constant";
+            public static final String whitenoise = "whitenoise";
+            public static final String lrs = "lrs";
+        }
+
+        /**
+         * Enumerated values for use_complex
+         */
+        public static class use_complex {
+            public static final int REAL_ONLY = 1;
+            public static final int COMPLEX = 2;
+        }
+    }
 
     /**
      * The property frequency
@@ -60,7 +95,7 @@ public abstract class SigGen_base extends ThreadedResource {
             1000.0, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -76,7 +111,7 @@ public abstract class SigGen_base extends ThreadedResource {
             5000.0, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -92,7 +127,7 @@ public abstract class SigGen_base extends ThreadedResource {
             100.0, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -108,7 +143,7 @@ public abstract class SigGen_base extends ThreadedResource {
             "sine", //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -124,7 +159,7 @@ public abstract class SigGen_base extends ThreadedResource {
             1000, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -140,7 +175,7 @@ public abstract class SigGen_base extends ThreadedResource {
             true, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -156,7 +191,7 @@ public abstract class SigGen_base extends ThreadedResource {
             "SigGen Stream", //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -172,7 +207,7 @@ public abstract class SigGen_base extends ThreadedResource {
             -1.0, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -188,7 +223,7 @@ public abstract class SigGen_base extends ThreadedResource {
             -1.0, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
             );
     
     /**
@@ -204,16 +239,36 @@ public abstract class SigGen_base extends ThreadedResource {
             false, //default value
             Mode.READWRITE, //mode
             Action.EXTERNAL, //action
-            new Kind[] {Kind.CONFIGURE} //kind
+            new Kind[] {Kind.PROPERTY}
+            );
+    
+    /**
+     * The property use_complex
+     * If the meaning of this property isn't clear, a description should be added.
+     *
+     * @generated
+     */
+    public final LongProperty use_complex =
+        new LongProperty(
+            "use_complex", //id
+            "use_complex", //name
+            1, //default value
+            Mode.READWRITE, //mode
+            Action.EXTERNAL, //action
+            new Kind[] {Kind.PROPERTY}
             );
     
     // Uses/outputs
     /**
+     * If the meaning of this port isn't clear, a description should be added.
+     *
      * @generated
      */
     public bulkio.OutFloatPort port_dataFloat_out;
 
     /**
+     * If the meaning of this port isn't clear, a description should be added.
+     *
      * @generated
      */
     public bulkio.OutShortPort port_dataShort_out;
@@ -225,17 +280,32 @@ public abstract class SigGen_base extends ThreadedResource {
     {
         super();
 
+        setLogger( logger, SigGen_base.class.getName() );
+
+
         // Properties
         addProperty(frequency);
+
         addProperty(sample_rate);
+
         addProperty(magnitude);
+
         addProperty(shape);
+
         addProperty(xfer_len);
+
         addProperty(throttle);
+
         addProperty(stream_id);
+
         addProperty(chan_rf);
+
         addProperty(col_rf);
+
         addProperty(sri_blocking);
+
+        addProperty(use_complex);
+
 
         // Uses/outputs
         this.port_dataFloat_out = new bulkio.OutFloatPort("dataFloat_out");
@@ -244,15 +314,13 @@ public abstract class SigGen_base extends ThreadedResource {
         this.addPort("dataShort_out", this.port_dataShort_out);
     }
 
-    public void start() throws CF.ResourcePackage.StartError
-    {
-        super.start();
+
+    protected void setupPortLoggers() {
+        port_dataFloat_out.setLogger(this._baseLog.getChildLogger("dataFloat_out", "ports"));
+        port_dataShort_out.setLogger(this._baseLog.getChildLogger("dataShort_out", "ports"));
     }
 
-    public void stop() throws CF.ResourcePackage.StopError
-    {
-        super.stop();
-    }
+
 
     /**
      * The main function of your component.  If no args are provided, then the
@@ -268,7 +336,7 @@ public abstract class SigGen_base extends ThreadedResource {
         SigGen.configureOrb(orbProps);
 
         try {
-            ThreadedResource.start_component(SigGen.class, args, orbProps);
+            Component.start_component(SigGen.class, args, orbProps);
         } catch (InvalidObjectReference e) {
             e.printStackTrace();
         } catch (NotFound e) {
