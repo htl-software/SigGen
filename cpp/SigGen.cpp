@@ -303,10 +303,8 @@ int SigGen_i::serviceFunction()
 
 	// Advance time
 	nextTime.tfsec += cache.xfer_len * cache.sri.xdelta;
-	if (nextTime.tfsec > 1.0) {
-		nextTime.tfsec -= 1.0;
-		nextTime.twsec += 1.0;
-	}
+	nextTime.twsec += static_cast<int>(nextTime.tfsec); //increase seconds if fractional seconds get too big
+    nextTime.tfsec -= static_cast<int>(nextTime.tfsec);
 
 	} //end scope
 
